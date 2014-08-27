@@ -13,6 +13,7 @@ import win32con
 import ctypes
 import webbrowser
 import json
+import threading
 from time import sleep
 from datetime import datetime
 from datetime import timedelta
@@ -48,10 +49,7 @@ def Sign():
     Signin = "http://www.sun-knife.com/u.php"
     Singin2 = "http://home.51cto.com/index.php?s=/Home/index"
     date_object = LoadJson(r'Mytime.json')
-    # print 'date_object', date_object.date()
-    # print 'date', datetime.now().date()
     if date_object.date() >= datetime.now().date():
-        # print date_object.date(), datetime.now().date()
         win32api.MessageBox(win32con.NULL, 'Finished, thanks!', 'SUN 7+1', win32con.MB_OK )
         exit()
     else:
@@ -77,10 +75,36 @@ def Sign():
             win32api.MessageBox(win32con.NULL, 'Recode the timestamp to file!', 'SUN 7+1', win32con.MB_OK )
             WriteJson(r'Mytime.json', datetime.now())
 
-if __name__=='__main__':
+def bitcoin():
+    url1 = "http://freebitco.in/?op=home/"
+    t = "Click on FreeBitCoin!!"
+    Table = True
+    while(Table):
+        webbrowser.open(url1)
+        choice = win32api.MessageBox(0, str(t), "Continue?", win32con.MB_OKCANCEL)
+        if choice == 1:
+            print "CONTINUE"
+            sleep(3600)
+        elif choice == 2:
+            print "END"
+            Table = False
+
+def main():
     whnd = ctypes.windll.kernel32.GetConsoleWindow()
     if whnd != 0:
         ctypes.windll.user32.ShowWindow(whnd, 0)
-        ctypes.windll.kernel32.CloseHandle(whnd)    
-    sleep(120)
-    Sign()
+        ctypes.windll.kernel32.CloseHandle(whnd)
+    threads = []
+    t1 = threading.Thread(target=bitcoin,args=())
+    t2 = threading.Thread(target=Sign,args=())
+    threads.append(t1)
+    threads.append(t2)
+
+    for i in range(2):            # start threads
+        threads[i].start()
+
+    for i in range(2):            # wait for all
+        threads[i].join()       # threads to finish
+
+if __name__=='__main__':
+    main()
