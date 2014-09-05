@@ -47,7 +47,7 @@ def LoadJson(rfile):
 
 def Sign():
     Signin = "http://www.sun-knife.com/u.php"
-    Singin2 = "http://home.51cto.com/index.php?s=/Home/index"
+    Singin2 = "http://home.51cto.com/index.php?s=/Home/toSign"
     date_object = LoadJson(r'Mytime.json')
     if date_object.date() >= datetime.now().date():
         win32api.MessageBox(win32con.NULL, 'Finished, thanks!', 'SUN 7+1', win32con.MB_OK )
@@ -78,15 +78,27 @@ def Sign():
 def bitcoin():
     url1 = "http://freebitco.in/?op=home/"
     t = "Click on FreeBitCoin!!"
+    #sleep(30*60)
     Table = True
     while(Table):
         webbrowser.open(url1)
-        choice = win32api.MessageBox(0, str(t), "Continue?", win32con.MB_OKCANCEL)
-        if choice == 1:
+        choice = win32api.MessageBox(0, str(t), "Continue?", win32con.MB_YESNOCANCEL)
+        if choice == 6:
             print "CONTINUE"
             sleep(3600)
-        elif choice == 2:
-            print "END"
+        elif choice == 7:
+            print "RETRY"
+            webbrowser.open(url1)
+            sleep(5)
+            rechoice = win32api.MessageBox(0, str(t), "Continue?", win32con.MB_OKCANCEL)
+            if rechoice == 1:
+                print 'RECHOICE = OK'
+                sleep(3600)
+            else:
+                print 'RECHOICE = CANCEL'
+                Table = False
+        else:
+            print "CANCEL"
             Table = False
 
 def main():
@@ -99,7 +111,7 @@ def main():
     t2 = threading.Thread(target=Sign,args=())
     threads.append(t1)
     threads.append(t2)
-
+    sleep(180)
     for i in range(2):            # start threads
         threads[i].start()
 
